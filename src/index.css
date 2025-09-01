@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+@keyframes meshShift {
+  0%   { transform: translateY(0); filter: hue-rotate(0deg); }
+  50%  { transform: translateY(-6px); filter: hue-rotate(12deg); }
+  100% { transform: translateY(0); filter: hue-rotate(0deg); }
+}
+/* --- Marquee keyframes and utilities --- */
+@keyframes marquee-left {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes marquee-right {
+  0%   { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+/* The row that holds logos; wide enough to scroll smoothly */
+.marquee-row {
+  display: flex;
+  gap: 3rem;                /* adjust spacing between logos */
+  width: max-content;       /* shrink-wrap content */
+  white-space: nowrap;
+  will-change: transform;
+  padding-block: 0.25rem;
+}
+
+/* Speeds responsive: a bit slower on desktop for elegance */
+.marquee-left  { animation: marquee-left 22s linear infinite; }
+.marquee-right { animation: marquee-right 22s linear infinite; }
+
+@media (min-width: 768px) {
+  .marquee-left  { animation-duration: 28s; }
+  .marquee-right { animation-duration: 28s; }
+}
+
+@media (min-width: 1280px) {
+  .marquee-left  { animation-duration: 34s; }
+  .marquee-right { animation-duration: 34s; }
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .marquee-left, .marquee-right { animation: none; }
+}
+
+/* Logo cell + image sizing (easy to tweak) */
+.logo-cell {
+  flex: 0 0 auto;          /* don't shrink */
+  width: 10rem;            /* 160px cell: gives room for long logos */
+  height: 4.5rem;          /* 72px tall lane */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-img {
+  max-height: 3.5rem;      /* 56px max logo height */
+  max-width: 100%;
+  object-fit: contain;
+  opacity: 0.85;
+  transition: opacity 160ms ease;
+}
+.logo-img:hover { opacity: 1; }
+
