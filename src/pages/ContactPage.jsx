@@ -1,6 +1,7 @@
 // src/pages/ContactPage.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLocation } from "react-router-dom";
 import {
   FiSend,
   FiMail,
@@ -12,21 +13,67 @@ import {
 } from "react-icons/fi";
 
 export default function ContactPage() {
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
-  const [sent, setSent] = useState(false);
+  const location = useLocation();
 
-  const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const [form, setForm] = useState({ name: "", email: "", service: "", message: "" });
+  const [status, setStatus] = useState({ type: "", message: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const onSubmit = (e) => {
-    e.preventDefault();
-    const subject = encodeURIComponent(`Project inquiry from ${form.name}`);
-    const body = encodeURIComponent(
-      `${form.message}\n\n— ${form.name}\n${form.email}`
-    );
-    window.location.href = `mailto:cybatechnologies5@gmail.com?subject=${subject}&body=${body}`;
-    setSent(true);
-    setTimeout(() => setSent(false), 3000);
+  // ✅ Read ?service= from URL (e.g., /contact?service=UI%2FUX%20Design)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const selected = params.get("service");
+    if (selected) {
+      setForm((prev) => ({
+        ...prev,
+        service: selected,
+        message:
+          prev.message ||
+          `Hi Cyba, I’m interested in: ${selected}.\n\nMy goals:\nTimeline:\nBudget range:\n`,
+      }));
+    }
+  }, [location.search]);
+
+  const onChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    if (status.message) setStatus({ type: "", message: "" });
   };
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setStatus({ type: "info", message: "Sending..." });
+
+    try {
+      const res = await fetch("https://formspree.io/f/mpqdvrae", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(form),
+      });
+
+      if (res.ok) {
+        setStatus({ type: "success", message: "Sent! We’ll get back to you within 24 hours." });
+        setForm({ name: "", email: "", service: "", message: "" });
+      } else {
+        const data = await res.json().catch(() => null);
+        setStatus({ type: "error", message: data?.error || "Failed to send. Please try again." });
+      }
+    } catch (err) {
+      setStatus({ type: "error", message: "Network error. Please check your connection and try again." });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const statusStyles =
+    status.type === "success"
+      ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+      : status.type === "error"
+      ? "border-rose-200 bg-rose-50 text-rose-700"
+      : "border-slate-200 bg-slate-50 text-slate-700";
 
   return (
     <main className="relative overflow-hidden">
@@ -52,10 +99,10 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* INFO PANEL (Gradient) + FORM */}
+      {/* INFO PANEL + FORM */}
       <section className="px-6 py-20">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-[1.05fr_1fr] gap-10 items-stretch">
-          {/* Gradient Contact Panel (replaces image) */}
+          {/* Panel */}
           <motion.div
             initial={{ opacity: 0, x: -16 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -65,7 +112,6 @@ export default function ContactPage() {
                        bg-gradient-to-br from-[#3BD6BF] via-[#0D2036] to-[#3BD6BF]"
           >
             <div className="relative h-full rounded-[22px] bg-[#0D2036] text-white p-8 md:p-10">
-              {/* soft decorative glow */}
               <motion.div
                 aria-hidden
                 className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-[#3BD6BF]/20 blur-3xl"
@@ -101,10 +147,7 @@ export default function ContactPage() {
                         +233 267 743 307
                       </a>
                       <div>
-                        <a
-                          href="tel:+233543737620"
-                          className="text-lg hover:text-[#3BD6BF] transition"
-                        >
+                        <a href="tel:+233543737620" className="text-lg hover:text-[#3BD6BF] transition">
                           +233 543 737 620
                         </a>
                       </div>
@@ -147,7 +190,6 @@ export default function ContactPage() {
                   </div>
                 </div>
 
-                {/* Call-to-action buttons */}
                 <div className="mt-8 flex flex-wrap gap-3">
                   <motion.a
                     whileHover={{ y: -2, scale: 1.02 }}
@@ -178,6 +220,9 @@ export default function ContactPage() {
             onSubmit={onSubmit}
             className="relative rounded-3xl bg-white p-6 md:p-8 shadow-lg ring-1 ring-slate-200"
           >
+            {/* ✅ hidden field for Formspree sorting */}
+            <input type="hidden" name="service" value={form.service} />
+
             <div className="space-y-5">
               <div>
                 <label className="block text-sm font-medium text-[#0D2036]">Name</label>
@@ -186,10 +231,12 @@ export default function ContactPage() {
                   value={form.name}
                   onChange={onChange}
                   placeholder="Your full name"
-                  className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:ring-2 focus:ring-[#3BD6BF] outline-none"
+                  className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:ring-2 focus:ring-[#3BD6BF] outline-none disabled:opacity-60"
                   required
+                  disabled={isSubmitting}
                 />
               </div>
+
               <div>
                 <label className="block text-sm font-medium text-[#0D2036]">Email</label>
                 <input
@@ -198,10 +245,40 @@ export default function ContactPage() {
                   value={form.email}
                   onChange={onChange}
                   placeholder="you@company.com"
-                  className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:ring-2 focus:ring-[#3BD6BF] outline-none"
+                  className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:ring-2 focus:ring-[#3BD6BF] outline-none disabled:opacity-60"
                   required
+                  disabled={isSubmitting}
                 />
               </div>
+
+              <div>
+  <label className="block text-sm font-medium text-[#0D2036]">Service</label>
+  <select
+    name="service"
+    value={form.service}
+    onChange={onChange}
+    disabled={isSubmitting}
+    className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none transition focus:ring-2 focus:ring-[#3BD6BF] disabled:opacity-60"
+  >
+    <option value="">Select a service</option>
+    <option value="Custom Website Design">Custom Website Design</option>
+    <option value="Search Engine Optimization">Search Engine Optimization</option>
+    <option value="Mobile App Development">Mobile App Development</option>
+    <option value="E-commerce Solutions">E-commerce Solutions</option>
+    <option value="UI/UX Design">UI/UX Design</option>
+    <option value="Maintenance & Support">Maintenance & Support</option>
+  </select>
+</div>
+
+
+              {/* ✅ show selected service */}
+              {form.service && (
+                <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                  <span className="font-semibold text-[#0D2036]">Selected service:</span>{" "}
+                  {form.service}
+                </div>
+              )}
+
               <div>
                 <label className="block text-sm font-medium text-[#0D2036]">Message</label>
                 <textarea
@@ -210,23 +287,36 @@ export default function ContactPage() {
                   onChange={onChange}
                   rows={6}
                   placeholder="Tell us about your project…"
-                  className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:ring-2 focus:ring-[#3BD6BF] outline-none"
+                  className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:ring-2 focus:ring-[#3BD6BF] outline-none disabled:opacity-60"
                   required
+                  disabled={isSubmitting}
                 />
               </div>
+
               <motion.button
-                whileHover={{ y: -2, scale: 1.02 }}
-                whileTap={{ scale: 0.96 }}
+                whileHover={isSubmitting ? {} : { y: -2, scale: 1.02 }}
+                whileTap={isSubmitting ? {} : { scale: 0.96 }}
                 type="submit"
-                className="inline-flex items-center gap-2 rounded-xl bg-[#3BD6BF] px-6 py-3 font-semibold text-[#0D2036]"
+                disabled={isSubmitting}
+                className="inline-flex items-center gap-2 rounded-xl bg-[#3BD6BF] px-6 py-3 font-semibold text-[#0D2036] disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Send message <FiSend />
+                {isSubmitting ? "Sending..." : "Send message"} <FiSend />
               </motion.button>
+
+              {status.message && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`rounded-xl border px-4 py-3 text-sm ${statusStyles}`}
+                >
+                  {status.message}
+                </motion.div>
+              )}
             </div>
 
-            {/* Toast */}
+            {/* Tiny success toast (optional) */}
             <AnimatePresence>
-              {sent && (
+              {status.type === "success" && (
                 <motion.div
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -279,13 +369,11 @@ export default function ContactPage() {
                   <h3 className="text-2xl md:text-4xl font-extrabold tracking-tight text-[#0D2036]">
                     Ready to collaborate?
                   </h3>
-                  <p className="mt-2 text-slate-700">
-                    Let’s bring your ideas to life. Reach out today.
-                  </p>
+                  <p className="mt-2 text-slate-700">Let’s bring your ideas to life. Reach out today.</p>
                 </div>
                 <div className="flex md:justify-end">
                   <a
-                    href="mailto:cybatechnologies5@gmail.com"
+                    href="/#contact"
                     className="inline-flex items-center gap-2 rounded-xl bg-[#3BD6BF] px-6 py-3 font-semibold text-[#0D2036]"
                   >
                     Contact Us <FiArrowRight />

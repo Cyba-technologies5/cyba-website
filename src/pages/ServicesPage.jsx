@@ -162,33 +162,140 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      {/* ===== HORIZONTAL CASE STUDIES RAIL ===== */}
-      <section className="bg-white py-16 px-6">
-        <div className="max-w-7xl mx-auto">
-          <motion.h3 {...fadeUp()} className="text-2xl md:text-3xl font-extrabold text-[#0D2036]">Recent outcomes</motion.h3>
-          <div className="mt-8 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <div className="flex gap-6 min-w-max">
-              {[
-                { t:"Retail performance dashboard", img:"https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1400&auto=format&fit=crop" },
-                { t:"Fintech onboarding flow", img:"https://images.unsplash.com/photo-1556742044-3c52d6e88c62?q=80&w=1400&auto=format&fit=crop" },
-                { t:"Headless storefront revamp", img:"https://images.unsplash.com/photo-1519337265831-281ec6cc8514?q=80&w=1400&auto=format&fit=crop" },
-                { t:"Internal ops portal", img:"https://images.unsplash.com/photo-1556157382-97eda2d62296?q=80&w=1400&auto=format&fit=crop" },
-              ].map((c,i)=>(
-                <motion.a key={c.t} href="#"
-                  initial={{ opacity:0, y:14 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
-                  transition={{ duration:0.5, delay:0.04*i }}
-                  className="group relative w-[320px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                  <img src={c.img} alt="" className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-105"/>
-                  <div className="p-4">
-                    <div className="font-semibold text-[#0D2036]">{c.t}</div>
-                    <div className="mt-1 text-sm text-slate-600">View case study</div>
+    {/* ===== MOVING RAIL (AUTO MARQUEE) ===== */}
+<section className="bg-white py-16 px-6">
+  <div className="max-w-7xl mx-auto">
+    <motion.h3 {...fadeUp()} className="text-2xl md:text-3xl font-extrabold text-[#0D2036]">
+      Sample deliverables
+    </motion.h3>
+    <p className="mt-2 text-slate-600 max-w-2xl">
+      We may be early-stage, but our delivery is structured. Here are examples of what you’ll receive during a project.
+    </p>
+
+    {/* rail */}
+    <div className="relative mt-8 overflow-hidden">
+      {/* edge fades */}
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-white to-transparent z-10" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-white to-transparent z-10" />
+
+      <div className="cyba-marquee group">
+        <div className="cyba-track">
+          {/* COPY 1 */}
+          <div className="flex gap-6 pr-6">
+            {[
+              {
+                t: "UI wireframes + user flows",
+                img: "https://images.unsplash.com/photo-1553877522-43269d4ea984?q=80&w=1400&auto=format&fit=crop",
+                d: "Clickable structure before we design pixels.",
+              },
+              {
+                t: "High-fidelity UI screens",
+                img: "https://images.unsplash.com/photo-1559028012-481c04fa702d?q=80&w=1400&auto=format&fit=crop",
+                d: "Polished screens aligned to your brand.",
+              },
+              {
+                t: "Performance + SEO audit report",
+                img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1400&auto=format&fit=crop",
+                d: "Clear fixes list + impact priorities.",
+              },
+              {
+                t: "MVP build + staging link",
+                img: "https://images.unsplash.com/photo-1556157382-97eda2d62296?q=80&w=1400&auto=format&fit=crop",
+                d: "A working demo you can test before launch.",
+              },
+            ].map((c) => (
+              <a
+                key={c.t}
+                href="/contact"
+                className="group/card relative w-[320px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition"
+              >
+                <img
+                  src={c.img}
+                  alt=""
+                  className="h-44 w-full object-cover transition-transform duration-500 group-hover/card:scale-105"
+                />
+                <div className="p-4">
+                  <div className="font-semibold text-[#0D2036]">{c.t}</div>
+                  <div className="mt-1 text-sm text-slate-600">{c.d}</div>
+                  <div className="mt-3 text-sm font-semibold text-[#3BD6BF] group-hover/card:underline">
+                    Ask for samples →
                   </div>
-                </motion.a>
-              ))}
-            </div>
+                </div>
+              </a>
+            ))}
+          </div>
+
+          {/* COPY 2 (for seamless loop) */}
+          <div className="flex gap-6 pr-6" aria-hidden="true">
+            {[
+              {
+                t: "UI wireframes + user flows",
+                img: "https://images.unsplash.com/photo-1553877522-43269d4ea984?q=80&w=1400&auto=format&fit=crop",
+                d: "Clickable structure before we design pixels.",
+              },
+              {
+                t: "High-fidelity UI screens",
+                img: "https://images.unsplash.com/photo-1559028012-481c04fa702d?q=80&w=1400&auto=format&fit=crop",
+                d: "Polished screens aligned to your brand.",
+              },
+              {
+                t: "Performance + SEO audit report",
+                img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1400&auto=format&fit=crop",
+                d: "Clear fixes list + impact priorities.",
+              },
+              {
+                t: "MVP build + staging link",
+                img: "https://images.unsplash.com/photo-1556157382-97eda2d62296?q=80&w=1400&auto=format&fit=crop",
+                d: "A working demo you can test before launch.",
+              },
+            ].map((c) => (
+              <a
+                key={"dup-" + c.t}
+                href="/contact"
+                className="group/card relative w-[320px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition"
+              >
+                <img
+                  src={c.img}
+                  alt=""
+                  className="h-44 w-full object-cover transition-transform duration-500 group-hover/card:scale-105"
+                />
+                <div className="p-4">
+                  <div className="font-semibold text-[#0D2036]">{c.t}</div>
+                  <div className="mt-1 text-sm text-slate-600">{c.d}</div>
+                  <div className="mt-3 text-sm font-semibold text-[#3BD6BF] group-hover/card:underline">
+                    Ask for samples →
+                  </div>
+                </div>
+              </a>
+            ))}
           </div>
         </div>
-      </section>
+      </div>
+
+      {/* local CSS (safe in Vite/React) */}
+      <style>{`
+        .cyba-marquee { width: 100%; overflow: hidden; }
+        .cyba-track {
+          display: flex;
+          width: max-content;
+          animation: cybaMarquee 30s linear infinite;
+        }
+        .cyba-marquee:hover .cyba-track,
+        .cyba-marquee:focus-within .cyba-track {
+          animation-play-state: paused;
+        }
+        @keyframes cybaMarquee {
+          from { transform: translateX(0); }
+          to   { transform: translateX(-50%); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .cyba-track { animation: none; }
+        }
+      `}</style>
+    </div>
+  </div>
+</section>
+
 
       {/* ===== PROCESS TIMELINE (animated connectors) ===== */}
       <section className="bg-slate-50 py-16 px-6">

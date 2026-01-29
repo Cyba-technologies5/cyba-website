@@ -8,6 +8,7 @@ import Frimsa from "../assets/frimsafoods_logo.png";
 import Farmrite from "../assets/farmrite logo.jpg";
 import VA4ME from "../assets/VA4ME_logo-png.png";
 import Multipointers from "../assets/multipointers logo.png";
+import Menorah from "../assets/menorah-logo2.png"
 
 const logos = [
   { src: Daven, alt: "Daven Consultants" },
@@ -15,6 +16,7 @@ const logos = [
   { src: Farmrite, alt: "Farmrite Greens" },
   { src: VA4ME, alt: "VA4ME" },
   { src: Multipointers, alt: "Multipointers Ltd" },
+  { src: Menorah, alt: "Menorah" },
 ];
 
 // Repeat enough to cover ultra‑wide screens
