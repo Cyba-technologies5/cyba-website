@@ -12,3 +12,9 @@ createRoot(document.getElementById("root")).render(
     </BrowserRouter>
   </StrictMode>
 );
+// ✅ remove the HTML preloader after mount
+const boot = document.getElementById("boot-preloader");
+if (boot) {
+  boot.classList.add("is-done");
+  window.setTimeout(() => boot.remove(), 350);
+}
